@@ -74,7 +74,7 @@
     </Compile>
     <Compile Include="OracleProvider.cs" />
     <Compile Include="Page.cs" />
-    <Compile Include="PetaPoco.cs" />
+    <Compile Include="Database.cs" />
     <Compile Include="PocoColumn.cs" />
     <Compile Include="PocoData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

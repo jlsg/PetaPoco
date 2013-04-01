@@ -411,8 +411,20 @@ namespace PetaPoco
 		public virtual void OnExecutingCommand(IDbCommand cmd) { }
 		public virtual void OnExecutedCommand(IDbCommand cmd) { }
 
-		// Execute a non-query command
+
+		public int ExecuteStoredProcedure(string procedureName, IEnumerable<IDbDataParameter> parameters)
+		{
+			EnableNamedParams = false;
+			return Execute(procedureName, true, parameters.ToArray());
+		}
+
 		public int Execute(string sql, params object[] args)
+		{
+			return Execute(sql, false, args);
+		}
+
+		// Execute a non-query command
+		public int Execute(string sql, bool isStoredProcedure, params object[] args)
 		{
 			try
 			{
@@ -421,7 +433,15 @@ namespace PetaPoco
 				{
 					using (var cmd = CreateCommand(_sharedConnection, sql, args))
 					{
-						var retv=cmd.ExecuteNonQuery();
+						if (isStoredProcedure)
+						{
+							cmd.CommandType = CommandType.StoredProcedure;
+						}
+						var retv = cmd.ExecuteNonQuery();
+
+						if (cmd.Parameters.Count > 0 && (((IDbDataParameter)cmd.Parameters[0]).Direction == ParameterDirection.Output || ((IDbDataParameter)cmd.Parameters[0]).Direction == ParameterDirection.ReturnValue))
+							retv = (int)((IDbDataParameter)cmd.Parameters[0]).Value;
+
 						OnExecutedCommand(cmd);
 						return retv;
 					}
@@ -440,8 +460,23 @@ namespace PetaPoco
 
 		public int Execute(Sql sql)
 		{
-			return Execute(sql.SQL, sql.Arguments);
+			return Execute(sql.SQL, false, sql.Arguments);
 		}
+
+		public T ExecuteScalarStoredProcedure<T>(string sql, params object[] args)
+		{
+			EnableNamedParams = false;
+			return ExecuteScalar<T>(sql, true, args);
+		}
+
+
+		public T ExecuteScalarStoredProcedure<T>(string sql, IEnumerable<IDbDataParameter> parameters)
+		{
+			EnableNamedParams = false;
+			return ExecuteScalar<T>(sql, true, parameters.ToArray());
+		}
+
+
 
 		// Execute and cast a scalar property
 		public T ExecuteScalar<T>(string sql, params object[] args)
