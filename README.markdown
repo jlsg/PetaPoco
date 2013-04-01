@@ -20,3 +20,5 @@ works with "Poco"s ... "PetaPoco" seemed like a fun name!!
 
 
 See here - <http://www.toptensoftware.com/petapoco> - for full details.
+
+This fork will add better stored proc support.
