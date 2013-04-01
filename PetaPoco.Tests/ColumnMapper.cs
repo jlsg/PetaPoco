@@ -76,7 +76,7 @@ namespace PetaPoco.Tests
 		{
 
 			PetaPoco.Database.Mapper = new MyColumnMapper();
-			var pd=PetaPoco.Database.PocoData.ForType(typeof(Poco2));
+			var pd=PetaPoco.PocoData.ForType(typeof(Poco2));
 
 			Assert.AreEqual(pd.Columns.Count, 3);
 			Assert.AreEqual(pd.Columns["prop1"].PropertyInfo.Name, "prop1");
