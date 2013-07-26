@@ -65,6 +65,7 @@
     <Compile Include="AnsiString.cs" />
     <Compile Include="Attributes.cs" />
     <Compile Include="ExpandoColumn.cs" />
+    <Compile Include="IDatabase.cs" />
     <Compile Include="IMapper.cs" />
     <Compile Include="IMapper2.cs" />
     <Compile Include="Models\Generated\Database.cs">

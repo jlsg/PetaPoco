@@ -26,7 +26,7 @@ using System.Linq.Expressions;
 namespace PetaPoco
 {
 	// Database class ... this is where most of the action happens
-	public class Database : IDisposable
+	public class Database : IDisposable, IDatabase
 	{
 		public Database(IDbConnection connection)
 		{
@@ -479,7 +479,7 @@ namespace PetaPoco
 
 
 		// Execute and cast a scalar property
-		public T ExecuteScalar<T>(string sql, params object[] args)
+		public T ExecuteScalar<T>(string sql, bool isStoredProcedure, params object[] args)
 		{
 			try
 			{
@@ -488,6 +488,10 @@ namespace PetaPoco
 				{
 					using (var cmd = CreateCommand(_sharedConnection, sql, args))
 					{
+						if (isStoredProcedure)
+						{
+							cmd.CommandType = CommandType.StoredProcedure;
+						}
 						object val = cmd.ExecuteScalar();
 						OnExecutedCommand(cmd);
 						return (T)Convert.ChangeType(val, typeof(T));
@@ -505,9 +509,14 @@ namespace PetaPoco
 			}
 		}
 
+		public T ExecuteScalar<T>(string sql, params object[] args)
+		{
+			return ExecuteScalar<T>(sql, false, args);
+		}
+
 		public T ExecuteScalar<T>(Sql sql)
 		{
-			return ExecuteScalar<T>(sql.SQL, sql.Arguments);
+			return ExecuteScalar<T>(sql.SQL, false, sql.Arguments);
 		}
 
 		Regex rxSelect = new Regex(@"\A\s*(SELECT|EXECUTE|CALL)\s", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase | RegexOptions.Multiline);
@@ -538,6 +547,16 @@ namespace PetaPoco
 		public List<T> Fetch<T>(string sql, params object[] args) 
 		{
 			return Query<T>(sql, args).ToList();
+		}
+
+		public List<T> FetchStoredProcedure<T>(string sql, params object[] args)
+		{
+			throw new NotImplementedException();
+		}
+
+		public List<T> FetchStoredProcedure<T>(string sql, IEnumerable<IDbDataParameter> parameters)
+		{
+			throw new NotImplementedException();
 		}
 
 		public List<T> Fetch<T>(Sql sql) 
